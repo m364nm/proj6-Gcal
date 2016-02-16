@@ -1,10 +1,10 @@
 # proj6-Gcal
-Snarf appointment data from a selection of a user's Google calendars 
+Snarf appointment data from a selection of a user's Google calendars
 
 ## What is here
 
 I've provided code for the authorization (oauth2) protocol for Google
-calendars.  There is also a picker for a date range. 
+calendars.  There is also a picker for a date range.
 
 ## What you'll add
 
@@ -27,18 +27,28 @@ https://developers.google.com/identity/protocols/OAuth2 .
 The applicable scenario for us is 'Web server applications'  (since
 we're doing this in Flask).  
 
-Your client secret will have to be registered for the URLs used for 
+Your client secret will have to be registered for the URLs used for
 the oauth2 'callback' in the authorization protocol.  This URL includes
-the port on which your application is running, so you you will need to 
-use the same port each time you run your application.  I suggest you 
-generate one random port in the range 5000-8000 and stick with it for the 
-remainder of the term (unless someone else randomly draws the same port). 
+the port on which your application is running, so you you will need to
+use the same port each time you run your application.  I suggest you
+generate one random port in the range 5000-8000 and stick with it for the
+remainder of the term (unless someone else randomly draws the same port).
 
-More about the client secret file is described in our Piazza group. 
+More about the client secret file is described in our Piazza group.
 
 Whether or not you already have a Google calendar, it's a good idea to
 create one or two 'test' calendars with a known set of appointments
 for testing.
 
+## Setup
 
+* Download the repository
+* (Optional): Modify the pyenv version to 3.4 or 3.5 based on the compatible version in your environment
+* Run ```make install```
+* Configure CONFIG.base.py to your current setup and Google license key
+* Run ```. env/bin/activate```
+* Run the program: ```python3 main.py```
 
+## testing
+
+To run the unit tests for this program, run ```python3 unit_tests.py```
