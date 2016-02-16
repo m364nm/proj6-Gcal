@@ -1,0 +1,26 @@
+{
+  "name": "proj6-gcal",
+  "version": "1.0.0",
+  "description": "CIS 399 ",
+  "main": "busy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m364nm/proj6-Gcal.git"
+  },
+  "author": "Megan McMillan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/m364nm/proj6-Gcal/issues"
+  },
+  "homepage": "https://github.com/m364nm/proj6-Gcal#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "bootstrap-daterangepicker": "^2.1.17",
+    "browserify": "^13.0.0",
+    "jquery": "^2.2.0",
+    "moment": "^2.11.2"
+  }
+}

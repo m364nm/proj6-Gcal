@@ -8,9 +8,9 @@
 # Configuration options
 #
 # On most platforms:
-#PYVENV = pyvenv-3.4
+PYVENV = pyvenv-3.5
 # On ix (with bug in ubuntu)
-PYVENV = pyvenv-3.4 --without-pip
+#PYVENV = pyvenv-3.4 --without-pip
 
 
 #
