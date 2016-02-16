@@ -39,6 +39,7 @@ install:
 	$(PYVENV)  env
 	make env/bin/pip
 	(.  env/bin/activate; pip install -r requirements.txt)
+	(cd static/js; npm install)
 
 env/bin/pip: env/bin/activate
 	echo ""

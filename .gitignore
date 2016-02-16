@@ -2,6 +2,7 @@
 client_secret.json
 CONFIG.py
 .goog_app_key.json
+static/js/node_modules
 *~
 
 
