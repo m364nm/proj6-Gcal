@@ -32,5 +32,6 @@ remainder of the term (unless someone else randomly draws the same port).
 * Run ```make install```
 * Copy CONFIG.base.py to CONFIG.py and configure it to your current setup and Google license key
 * Run ```. env/bin/activate```
+* Compile the dependencies ```make all```
 * Run the program: ```python3 main.py```
 * Navigate to 'localhost:5000' (or the specific host:port address you are using) in the browser
