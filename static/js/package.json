@@ -1,7 +1,7 @@
 {
   "name": "proj6-gcal",
   "version": "1.0.0",
-  "description": "CIS 399 ",
+  "description": "CIS 399 MeetMe App",
   "main": "busy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,6 +19,7 @@
   "dependencies": {
     "bootstrap": "^3.3.6",
     "bootstrap-daterangepicker": "^2.1.17",
+    "bootstrap-timepicker": "^0.5.2",
     "browserify": "^13.0.0",
     "jquery": "^2.2.0",
     "moment": "^2.11.2"

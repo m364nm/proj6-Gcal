@@ -1,27 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<html lang="en"> <head>
-<title>Appointments</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+  <title>Appointments</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel=stylesheet type=text/css href="/static/css/propose.min.css">
+  <link rel=stylesheet type=text/css href="/static/css/propose.min.css">
 
-<!-- jquery doesn't follow npm rules; load it directly, not through -->
-<!-- @require -->
-<script
-     src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
-</script>
-
-
-<!-- The rest of our libraries are loaded with the minified version of -->
-<!-- our main javascript application file -->
-<script type="text/javascript"
-   src="/static/js/propose.min.js">
-</script>
-
-<link rel="stylesheet" type="text/css"
-     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+  <!-- jquery doesn't follow npm rules; load it directly, not through -->
+  <!-- @require -->
+  <script
+       src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+  </script>
 
 
+  <!-- The rest of our libraries are loaded with the minified version of -->
+  <!-- our main javascript application file -->
+  <script type="text/javascript" src="/static/js/propose.min.js">
+  </script>
+
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
 </head>
 
 <body>
@@ -46,7 +43,7 @@
 {% endwith %}
 
 <h2>Date range</h2>
-  <form action="/setrange" method="post">
+<form action="/setrange" method="post">
   <input type="text" name="daterange"
     {% if session.daterange is defined %}
          value="{{session.daterange}}"
@@ -68,10 +65,9 @@
            'Within two weeks':[moment(),moment().add(15, 'days')]
         }}
        );
-    });
   </script>
 
-<input type="submit" value="Apply date range" />
+  <input type="submit" value="Apply date range" />
 </form>
 
     <!--

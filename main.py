@@ -7,7 +7,7 @@ import uuid
 import json
 import logging
 
-# Date handling 
+# Date handling
 import arrow # Replacement for datetime, based on moment.js
 import datetime # But we still need time
 from dateutil import tz  # For interpreting local times
@@ -17,7 +17,7 @@ from dateutil import tz  # For interpreting local times
 from oauth2client import client
 import httplib2   # used in oauth2 flow
 
-# Google API for services 
+# Google API for services
 from apiclient import discovery
 
 ###
@@ -46,10 +46,10 @@ def index():
 
 @app.route("/choose")
 def choose():
-    ## We'll need authorization to list calendars 
+    ## We'll need authorization to list calendars
     ## I wanted to put what follows into a function, but had
     ## to pull it back here because the redirect has to be a
-    ## 'return' 
+    ## 'return'
     app.logger.debug("Checking credentials for Google calendar access")
     credentials = valid_credentials()
     if not credentials:
@@ -59,6 +59,7 @@ def choose():
     gcal_service = get_gcal_service(credentials)
     app.logger.debug("Returned from get_gcal_service")
     flask.session['calendars'] = list_calendars(gcal_service)
+    flask.session['busy_times'] = list_busy_times(gcal_service)
     return render_template('index.html')
 
 ####
@@ -69,7 +70,7 @@ def choose():
 #      redirect to OAuth server first, and may take multiple
 #      trips through the oauth2 callback function.
 #
-#  Protocol for use ON EACH REQUEST: 
+#  Protocol for use ON EACH REQUEST:
 #     First, check for valid credentials
 #     If we don't have valid credentials
 #         Get credentials (jump to the oauth2 protocol)
@@ -82,11 +83,11 @@ def choose():
 #  from the Google services. Service objects are NOT serializable ---
 #  we can't stash one in a cookie.  Instead, on each request we
 #  get a fresh serivce object from our credentials, which are
-#  serializable. 
+#  serializable.
 #
 #  Note that after authorization we always redirect to /choose;
 #  If this is unsatisfactory, we'll need a session variable to use
-#  as a 'continuation' or 'return address' to use instead. 
+#  as a 'continuation' or 'return address' to use instead.
 #
 ####
 
@@ -95,7 +96,7 @@ def valid_credentials():
     Returns OAuth2 credentials if we have valid
     credentials in the session.  This is a 'truthy' value.
     Return None if we don't have credentials, or if they
-    have expired or are otherwise invalid.  This is a 'falsy' value. 
+    have expired or are otherwise invalid.  This is a 'falsy' value.
     """
     if 'credentials' not in flask.session:
       return None
@@ -140,12 +141,12 @@ def oauth2callback():
       scope= SCOPES,
       redirect_uri=flask.url_for('oauth2callback', _external=True))
   ## Note we are *not* redirecting above.  We are noting *where*
-  ## we will redirect to, which is this function. 
-  
-  ## The *second* time we enter here, it's a callback 
+  ## we will redirect to, which is this function.
+
+  ## The *second* time we enter here, it's a callback
   ## with 'code' set in the URL parameter.  If we don't
   ## see that, it must be the first time through, so we
-  ## need to do step 1. 
+  ## need to do step 1.
   app.logger.debug("Got flow")
   if 'code' not in flask.request.args:
     app.logger.debug("Code not in flask.request.args")
@@ -173,7 +174,7 @@ def oauth2callback():
 #     computation here; use of the information might
 #     depend on what other information we have.
 #   Setting an option sends us back to the main display
-#      page, where we may put the new information to use. 
+#      page, where we may put the new information to use.
 #
 #####
 
@@ -183,29 +184,31 @@ def setrange():
     User chose a date range with the bootstrap daterange
     widget.
     """
-    app.logger.debug("Entering setrange")  
-    flask.flash("Setrange gave us '{}'".format(
-      request.form.get('daterange')))
+    app.logger.debug("Entering setrange")
+    #flask.flash("Setrange gave us '{}' + '{} - {}'".format(request.form.get('daterange'), request.form.get('begin_time'), request.form.get('end_time')))
     daterange = request.form.get('daterange')
     flask.session['daterange'] = daterange
     daterange_parts = daterange.split()
     flask.session['begin_date'] = interpret_date(daterange_parts[0])
     flask.session['end_date'] = interpret_date(daterange_parts[2])
-    app.logger.debug("Setrange parsed {} - {}  dates as {} - {}".format(
-      daterange_parts[0], daterange_parts[1], 
-      flask.session['begin_date'], flask.session['end_date']))
+    flask.session['begin_time'] = request.form.get('begin_time')
+    flask.session['end_time'] = request.form.get('end_time')
+    app.logger.debug("Setrange parsed {} - {}  dates as {} - {} times as {} - {}".format(
+      daterange_parts[0], daterange_parts[1],
+      flask.session['begin_date'], flask.session['end_date'],
+      flask.session['begin_time'], flask.session['end_time']))
     return flask.redirect(flask.url_for("choose"))
 
 ####
 #
-#   Initialize session variables 
+#   Initialize session variables
 #
 ####
 
 def init_session_values():
     """
     Start with some reasonable defaults for date and time ranges.
-    Note this must be run in app context ... can't call from main. 
+    Note this must be run in app context ... can't call from main.
     """
     # Default date span = tomorrow to 1 week from now
     now = arrow.now('local')
@@ -216,9 +219,9 @@ def init_session_values():
     flask.session["daterange"] = "{} - {}".format(
         tomorrow.format("MM/DD/YYYY"),
         nextweek.format("MM/DD/YYYY"))
-    # Default time span each day, 8 to 5
-    flask.session["begin_time"] = interpret_time("9am")
-    flask.session["end_time"] = interpret_time("5pm")
+    # Default time span each day, 9 to 5
+    flask.session["begin_time"] = arrow.get(interpret_time("9am")).format('HH:mm')
+    flask.session["end_time"] = arrow.get(interpret_time("5pm")).format('HH:mm')
 
 def interpret_time( text ):
     """
@@ -227,16 +230,17 @@ def interpret_time( text ):
     May throw exception if time can't be interpreted. In that
     case it will also flash a message explaining accepted formats.
     """
-    app.logger.debug("Decoding time '{}'".format(text))
+    #app.logger.debug("Decoding time '{}'".format(text))
     time_formats = ["ha", "h:mma",  "h:mm a", "H:mm"]
-    try: 
+    try:
         as_arrow = arrow.get(text, time_formats).replace(tzinfo=tz.tzlocal())
-        app.logger.debug("Succeeded interpreting time")
+        #app.logger.debug("Succeeded interpreting time")
     except:
         app.logger.debug("Failed to interpret time")
         flask.flash("Time '{}' didn't match accepted formats 13:30 or 1:30pm"
               .format(text))
         raise
+
     return as_arrow.isoformat()
 
 def interpret_date( text ):
@@ -264,7 +268,7 @@ def next_day(isotext):
 #  Functions (NOT pages) that return some information
 #
 ####
-  
+
 def list_calendars(service):
     """
     Given a google 'service' object, return a list of
@@ -274,13 +278,13 @@ def list_calendars(service):
     the primary calendar first, and selected (that is, displayed in
     Google Calendars web app) calendars before unselected calendars.
     """
-    app.logger.debug("Entering list_calendars")  
+    app.logger.debug("Entering list_calendars")
     calendar_list = service.calendarList().list().execute()["items"]
     result = [ ]
     for cal in calendar_list:
         kind = cal["kind"]
         id = cal["id"]
-        if "description" in cal: 
+        if "description" in cal:
             desc = cal["description"]
         else:
             desc = "(no description)"
@@ -288,7 +292,7 @@ def list_calendars(service):
         # Optional binary attributes with False as default
         selected = ("selected" in cal) and cal["selected"]
         primary = ("primary" in cal) and cal["primary"]
-        
+
 
         result.append(
           { "kind": kind,
@@ -317,6 +321,87 @@ def cal_sort_key( cal ):
     return (primary_key, selected_key, cal["summary"])
 
 
+def list_busy_times(service):
+    """
+    This function queries the Goodle API freebusy to display the busy times of
+    all the calendars during the given window.
+    """
+    app.logger.debug("Entering list_busy_times")
+
+    #Get flask-calendars ids from session to send freebusy query
+    cal = []
+    cal = flask.session["calendars"]
+
+    #array of calendar ids to send in the request
+    calendar_ids = []
+    for i in range(len(cal)):
+        calendar_ids.append({"id":cal[i]['id']})
+
+    #Get start and end dates to send in freebusy query
+    timemin = flask.session["begin_date"]
+    timemax = flask.session["end_date"]
+
+    #setup query
+    freebusy_query = {
+        "timeMin" : timemin,
+        "timeMax" : timemax,
+        "items" : calendar_ids
+      }
+
+    #send query
+    result = service.freebusy().query(body=freebusy_query).execute()
+
+    app.logger.debug("Managing Response from freebusy query")
+
+    #get the data from the calendars field
+    res_cals = result.get('calendars')
+
+    #access the busy times in each calendar
+    for j in range(len(cal)):
+
+        busytimes = res_cals[str(cal[j]['id'])]
+        return_busy_times =  []
+
+        #iterate over the busy times in each calendar and check
+        for k in range(len(busytimes['busy'])):
+
+            start = busytimes['busy'][k]['start']
+            end = busytimes['busy'][k]['end']
+
+            #convert all times to be in the same time some and format
+            busy_start = arrow.get(start).to('local').format("HH:mm")
+            busy_end = arrow.get(end).to('local').format("HH:mm")
+            begin_time = arrow.get(interpret_time(flask.session["begin_time"])).to('local').format("HH:mm")
+            end_time = arrow.get(interpret_time(flask.session["end_time"])).to('local').format("HH:mm")
+
+            #calls a function to check overlap
+            resp = busy_overlap_times(busy_start, busy_end, begin_time, end_time)
+
+            #if it does overlap, format the times and update the list of all busy times
+            if resp:
+                return_start = arrow.get(start).to('local').format("MMM D YYYY (hh:mm A")
+                return_end = arrow.get(end).to('local').format("hh:mm A)")
+                return_busy_times.append("{} - {}".format(return_start, return_end))
+
+        #if there are any busy times for a calendar, flash the calendar and the busy appointments
+        if return_busy_times != []:
+            flask.flash("Busy times for calendar {}:\n{}".format(cal[j]['summary'], return_busy_times))
+        else:
+            flask.flash("There are no busy times for the calendar {} during the selected window".format(cal[j]['summary']))
+
+
+def busy_overlap_times(busy_start, busy_end, begin_time, end_time):
+    print("begin_time: {}, end_time: {}".format(begin_time, end_time))
+    print("busy_start: {}, busy_end: {}".format(busy_start, busy_end))
+    if ((begin_time < busy_start) & (busy_end < end_time)):
+        return True
+    elif ((begin_time < busy_start) & (busy_start < end_time)):
+        return True
+    elif ((begin_time < busy_end) & (busy_end < end_time)):
+        return True
+    else:
+        return False
+
 #################
 #
 # Functions used within the templates
@@ -325,7 +410,7 @@ def cal_sort_key( cal ):
 
 @app.template_filter( 'fmtdate' )
 def format_arrow_date( date ):
-    try: 
+    try:
         normal = arrow.get( date )
         return normal.format("ddd MM/DD/YYYY")
     except:
@@ -338,7 +423,7 @@ def format_arrow_time( time ):
         return normal.format("HH:mm")
     except:
         return "(bad time)"
-    
+
 #############
 
 
@@ -347,7 +432,7 @@ if __name__ == "__main__":
   # exist whether this is 'main' or not
   # (e.g., if we are running in a CGI script)
 
-  app.secret_key = str(uuid.uuid4())  
+  app.secret_key = str(uuid.uuid4())
   app.debug=CONFIG.DEBUG
   app.logger.setLevel(logging.DEBUG)
   # We run on localhost only if debugging,
@@ -356,6 +441,5 @@ if __name__ == "__main__":
     # Reachable only from the same computer
     app.run(port=CONFIG.PORT)
   else:
-    # Reachable from anywhere 
+    # Reachable from anywhere
     app.run(port=CONFIG.PORT,host="0.0.0.0")
-    

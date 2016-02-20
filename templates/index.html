@@ -3,17 +3,9 @@
 <title>Appointments</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet" type="text/css"
-     href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"
-/>
-
-<link rel="stylesheet" type="text/css"
- href="/static/js/node_modules/bootstrap-daterangepicker/daterangepicker.css"
-/>
-
-<link rel="stylesheet" type="text/css"
-    href="/static/css/busy.css"
-/>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css"/>
+<link rel="stylesheet" type="text/css" href="/static/js/node_modules/bootstrap-daterangepicker/daterangepicker.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/busy.css"/>
 
 <!-- jquery from a content distribution network; probably cached -->
 <script type="text/javascript"
@@ -51,30 +43,47 @@
 {% endwith %}
 
 <h2>Date range</h2>
-  <form action="/setrange" method="post">
+<form action="/setrange" method="post">
   <input type="text" name="daterange" size="12"
     {% if session.daterange is defined %}
          value="{{session.daterange}}"
     {% endif %}
      class="pull-down"
      style="background: #fff; cursor: pointer; padding: 5px 10px;
-     border: 1px solid #ccc; width: 12em" >
+     border: 1px solid #ccc; width: 14em" >
   <script type="text/javascript">
-  $(function() {
-  $('input[name="daterange"]').daterangepicker(
-    {    ranges: {
-           'Today': [moment(), moment()],
-           'Tomorrow':[moment().add(1, 'days'),
-                       moment().add(1, 'days')],
-           'This week':[moment(), moment().endOf('week')],
-           'Next week':[moment().add(7, 'days').startOf('week'),
-                        moment().add(7, 'days').endOf('week')],
-           'This month':[moment(), moment().endOf('month')],
-           'Within two weeks':[moment(),moment().add(15, 'days')]
-        }}
-       );
+    $(function() {
+    $('input[name="daterange"]').daterangepicker(
+      { ranges: {
+         'Today': [moment(), moment()],
+         'Tomorrow':[moment().add(1, 'days'),
+                     moment().add(1, 'days')],
+         'This week':[moment(), moment().endOf('week')],
+         'Next week':[moment().add(7, 'days').startOf('week'),
+                      moment().add(7, 'days').endOf('week')],
+         'This month':[moment(), moment().endOf('month')],
+         'Within two weeks':[moment(),moment().add(15, 'days')]
+       }}
+      );
     });
   </script>
+
+<h3> Time Range </h3>
+<div class="input-group bootstrap-timepicker timepicker timerange">
+    <input name="begin_time" id="timepicker1" type="text" class="form-control input-small" style="width:100px">
+    <input name="end_time" id="timepicker2" type="text" class="form-control input-small" style="width:100px">
+</div>
+
+<script type="text/javascript">
+    $('#timepicker1').timepicker('setTime', '{{session.begin_time}}');
+    $('#timepicker2').timepicker('setTime', '{{session.end_time}}');
+    $('.timerange').on('changeTime.timepicker', function(e) {
+      console.log('The time is ' + e.time.value);
+      console.log('The hour is ' + e.time.hours);
+      console.log('The minute is ' + e.time.minutes);
+      console.log('The meridian is ' + e.time.meridian);
+    });
+</script>
 
 <br /><input type="submit" value="Choose" />
 </form>
