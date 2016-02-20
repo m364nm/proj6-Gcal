@@ -1,8 +1,15 @@
 # proj6-Gcal
 Snarf appointment data from a selection of a user's Google calendars and display the busy times during the given window
 
+## Author
 
-## Hints
+Megan McMillan
+
+### Location on ix
+
+http://ix.cs.uoregon.edu/~mcmillan/htbin/cis399/proj5-mongo/
+
+## Get your google key
 
 You'll need a 'client secret' file of your own called '.goog_app_key.json'. Obtain a developer key from Google, see
 https://auth0.com/docs/connections/social/google and
