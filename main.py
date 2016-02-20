@@ -391,8 +391,8 @@ def list_busy_times(service):
 
 
 def busy_overlap_times(busy_start, busy_end, begin_time, end_time):
-    print("begin_time: {}, end_time: {}".format(begin_time, end_time))
-    print("busy_start: {}, busy_end: {}".format(busy_start, busy_end))
+    #print("begin_time: {}, end_time: {}".format(begin_time, end_time))
+    #print("busy_start: {}, busy_end: {}".format(busy_start, busy_end))
     if ((begin_time < busy_start) & (busy_end < end_time)):
         return True
     elif ((begin_time < busy_start) & (busy_start < end_time)):
